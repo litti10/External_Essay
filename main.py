@@ -12,7 +12,7 @@ MAX_EPOCH = 20
 BATCH_SIZE = 128
 
 def train(ep, model, dataloader, criterion, optimizer, writer):
-    model.train()
+    model.train() # 상태 전화
     running_loss = 0.0 
     running_loss_cnt = 0 # cnt (concount)
     global_cnt = len(dataloader) * (ep-1) 
@@ -36,23 +36,23 @@ def train(ep, model, dataloader, criterion, optimizer, writer):
         # print loss 
         if i % 40 == 0:
             running_loss /= running_loss_cnt
-            writer.add_scalar('train/loss', running_loss, global_cnt)
+            writer.add_scalar('train/loss', running_loss, global_cnt) # 그래프 만들기
             running_loss_cnt = 0
             running_loss =0.0
 
-    pred = torch.cat(pred) 
+    pred = torch.cat(pred) #cat: 하나의 텐서로 묶는 명령어
     gt = torch.cat(gt)
-    acc = torch.mean(pred.argmax(1) == gt).float().item() 
+    acc = torch.mean(pred.argmax(1) == gt).float().item() # pred.argmax--> 값 중 max값 찾기 / (1): row 단위 ((0): column 단위)
     writer.add_scalar('train/acc', acc, ep)
 
-@torch.no_grad()
+@torch.no_grad() # gradient 계산하는데 필요한 computational graph를 그리지 않겠다
 def test(ep, model, dataloader, writer): 
-    model.eval()
+    model.eval() #evaluation mode로 변환
     pred = [] 
     gt = []
     for i, data in enumerate(dataloader):
-        x = data['x'].cuda()
-        y = data['y'].cuda() 
+        x = data['x'].cuda() # dictionary에서 'x'를 key로 가지고 있는 값을 가져옴
+        y = data['y'].cuda() # dictionary에서 'y'를 key로 가지고 있는 값을 가져옴
         y_hat = model(x)
         # pred, gt
         pred.append(y_hat) 
